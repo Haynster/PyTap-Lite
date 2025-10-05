@@ -76,22 +76,31 @@ def convert_table(tbl, db_path="Level.sqlite"):
 cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
 tables = [row[0] for row in cursor.fetchall()]
 
+def get_nsdata(data):
+    dictionary = {}
+    if "NS.keys" in data and "NS.objects" in data:
+        # Sometimes the dictionaries in the converted SQL are in 2 seperate arrays of keys and values, this puts those together.
+        key = 0
+        for y in data["NS.keys"]:
+            dictionary[y] = data["NS.objects"][key]
+            key = key + 1
+        return dictionary
+    elif "NS.objects" in data:
+        # If its just an Array this gets it.
+        return data["NS.objects"]
+    elif "NS.string" in data:
+        # If its just an String this gets it.
+        return data["NS.string"]
+
 with open('data.json', 'a') as f:
     data = get_all()
 
-    # Organize ZACTIONS to be clearer
+    # Organize ZACTIONS in ZBEHAVIOURDATA to be clearer
     if "ZBEHAVIOURDATA" in data:
-        behaviour_index = 0
         for x in data["ZBEHAVIOURDATA"]:
-            key = 0
-            behaviour_data = x
-            z_actions = {}
-            for y in x["ZACTIONS"]["NS.data"]["NS.keys"]:
-                z_actions[y] = x["ZACTIONS"]["NS.data"]["NS.objects"][key]
-                key = key + 1
-            behaviour_data["ZACTIONS"] = z_actions
-            data["ZBEHAVIOURDATA"][behaviour_index] = behaviour_data
-            behaviour_index = behaviour_index + 1
+            z_actions = get_nsdata(x["ZACTIONS"]["NS.data"])
+            x["ZACTIONS"] = z_actions
+
     
     pyperclip.copy(json_util.dumps(data))
     f.write(json_util.dumps(data))
