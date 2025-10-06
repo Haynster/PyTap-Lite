@@ -94,7 +94,7 @@ def get_nsdata(data):
     else:
         return data
 
-with open('data.json', 'a') as f:
+with open('results/data.json', 'a') as f:
     data = get_all()
 
     # Organize ZACTIONS in ZBEHAVIOURDATA to be clearer
