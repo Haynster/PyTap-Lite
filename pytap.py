@@ -91,16 +91,24 @@ def get_nsdata(data):
     elif "NS.string" in data:
         # If its just an String this gets it.
         return data["NS.string"]
+    else:
+        return data
 
 with open('data.json', 'a') as f:
     data = get_all()
 
     # Organize ZACTIONS in ZBEHAVIOURDATA to be clearer
+    behaviour_index = 0
     if "ZBEHAVIOURDATA" in data:
         for x in data["ZBEHAVIOURDATA"]:
             z_actions = get_nsdata(x["ZACTIONS"]["NS.data"])
-            x["ZACTIONS"] = z_actions
 
+            data["ZBEHAVIOURDATA"][behaviour_index]["ZACTIONS"] = z_actions
+            behaviour_index = behaviour_index + 1
+        
+        #for x in data["ZBEHAVIOURDATA"]:
+            #for y in z_actions:
+                #print(get_nsdata(z_actions[y]))
     
     pyperclip.copy(json_util.dumps(data))
     f.write(json_util.dumps(data))
